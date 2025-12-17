@@ -18,6 +18,6 @@ if (ini_get("session.use_cookies")) {
 session_destroy();
 
 // Redirect về trang đăng nhập
-header('Location: /auth/login.php');
+header('Location: ' . url('auth/login.php'));
 exit();
 ?>

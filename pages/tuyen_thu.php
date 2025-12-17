@@ -105,7 +105,7 @@ try {
                         </p>
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="chi_tiet_tt.php?id=<?php echo $tuyen_thu['id']; ?>" class="btn btn-primary w-100">
+                        <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tuyen_thu['id']); ?>" class="btn btn-primary w-100">
                             <i class="bi bi-eye"></i> Xem chi tiết
                         </a>
                     </div>

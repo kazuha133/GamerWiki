@@ -51,8 +51,8 @@ try {
 <div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/index.php">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="tuyen_thu.php">Tuyển thủ</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('index.php'); ?>">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('pages/tuyen_thu.php'); ?>">Tuyển thủ</a></li>
             <li class="breadcrumb-item active"><?php echo escape_html($tuyen_thu['nickname']); ?></li>
         </ol>
     </nav>
@@ -97,7 +97,7 @@ try {
                         <i class="bi bi-shield-fill text-primary"></i> 
                         <strong>Đội tuyển hiện tại:</strong> 
                         <?php if ($tuyen_thu['ten_doi']): ?>
-                            <a href="chi_tiet_dt.php?id=<?php echo $tuyen_thu['doi_tuyen_id']; ?>">
+                            <a href="<?php echo url('pages/chi_tiet_dt.php?id=' . $tuyen_thu['doi_tuyen_id']); ?>">
                                 <?php echo escape_html($tuyen_thu['ten_doi']); ?>
                             </a>
                         <?php else: ?>

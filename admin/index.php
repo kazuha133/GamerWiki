@@ -138,7 +138,7 @@ try {
                                     <br>
                                     <small class="text-muted"><?php echo escape_html($doi['quoc_gia']); ?></small>
                                 </div>
-                                <a href="/pages/chi_tiet_dt.php?id=<?php echo $doi['id']; ?>" 
+                                <a href="<?php echo url('pages/chi_tiet_dt.php?id=' . $doi['id']); ?>" 
                                    class="btn btn-sm btn-outline-primary">Xem</a>
                             </div>
                         </div>
@@ -163,7 +163,7 @@ try {
                                     <br>
                                     <small class="text-muted"><?php echo escape_html($tt['vai_tro']); ?></small>
                                 </div>
-                                <a href="/pages/chi_tiet_tt.php?id=<?php echo $tt['id']; ?>" 
+                                <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tt['id']); ?>" 
                                    class="btn btn-sm btn-outline-success">Xem</a>
                             </div>
                         </div>
@@ -188,7 +188,7 @@ try {
                                     <br>
                                     <small class="text-muted"><?php echo escape_html($gd['game']); ?></small>
                                 </div>
-                                <a href="/pages/chi_tiet_gd.php?id=<?php echo $gd['id']; ?>" 
+                                <a href="<?php echo url('pages/chi_tiet_gd.php?id=' . $gd['id']); ?>" 
                                    class="btn btn-sm btn-outline-warning">Xem</a>
                             </div>
                         </div>

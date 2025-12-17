@@ -131,7 +131,7 @@ if ($action === 'list') {
                                        onclick="return confirmDelete('<?php echo escape_html($doi['ten_doi']); ?>')">
                                         <i class="bi bi-trash"></i>
                                     </a>
-                                    <a href="/pages/chi_tiet_dt.php?id=<?php echo $doi['id']; ?>" 
+                                    <a href="<?php echo url('pages/chi_tiet_dt.php?id=' . $doi['id']); ?>" 
                                        class="btn btn-sm btn-info" target="_blank">
                                         <i class="bi bi-eye"></i>
                                     </a>

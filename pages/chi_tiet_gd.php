@@ -43,8 +43,8 @@ try {
 <div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/index.php">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="giai_dau.php">Giải đấu</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('index.php'); ?>">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('pages/giai_dau.php'); ?>">Giải đấu</a></li>
             <li class="breadcrumb-item active"><?php echo escape_html($giai_dau['ten_giai']); ?></li>
         </ol>
     </nav>
@@ -141,7 +141,7 @@ try {
                             </td>
                             <td><?php echo format_ngay_gio($doi['ngay_tham_gia']); ?></td>
                             <td>
-                                <a href="chi_tiet_dt.php?id=<?php echo $doi['id_doi_tuyen']; ?>" 
+                                <a href="<?php echo url('pages/chi_tiet_dt.php?id=' . $doi['id_doi_tuyen']); ?>" 
                                    class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> Chi tiết
                                 </a>

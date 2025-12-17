@@ -91,6 +91,22 @@ Mở trình duyệt và truy cập:
 http://localhost/GamerWiki
 ```
 
+## 📍 Lưu ý về đường dẫn cài đặt
+
+Website hỗ trợ cài đặt ở cả:
+- **Root domain**: `http://localhost/` 
+- **Thư mục con**: `http://localhost/GamerWiki/`
+
+Hệ thống tự động phát hiện và điều chỉnh đường dẫn phù hợp.
+
+### Nếu cài đặt trong thư mục con:
+Copy project vào: `C:\wamp64\www\GamerWiki\`
+Truy cập: `http://localhost/GamerWiki/`
+
+### Nếu cài đặt ở root:
+Copy tất cả file vào: `C:\wamp64\www\`
+Truy cập: `http://localhost/`
+
 ## 👤 Tài khoản mặc định
 
 ### Admin
