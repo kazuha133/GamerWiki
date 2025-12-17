@@ -138,7 +138,7 @@ if ($action === 'list') {
                                        onclick="return confirmDelete('<?php echo escape_html($tt['nickname']); ?>')">
                                         <i class="bi bi-trash"></i>
                                     </a>
-                                    <a href="/pages/chi_tiet_tt.php?id=<?php echo $tt['id']; ?>" 
+                                    <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tt['id']); ?>" 
                                        class="btn btn-sm btn-info" target="_blank">
                                         <i class="bi bi-eye"></i>
                                     </a>

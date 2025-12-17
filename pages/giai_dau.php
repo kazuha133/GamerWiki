@@ -103,7 +103,7 @@ try {
                         <?php endif; ?>
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="chi_tiet_gd.php?id=<?php echo $giai['id']; ?>" class="btn btn-primary w-100">
+                        <a href="<?php echo url('pages/chi_tiet_gd.php?id=' . $giai['id']); ?>" class="btn btn-primary w-100">
                             <i class="bi bi-eye"></i> Xem chi tiết
                         </a>
                     </div>

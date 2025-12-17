@@ -48,8 +48,8 @@ try {
 <div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/index.php">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="doi_tuyen.php">Đội tuyển</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('index.php'); ?>">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="<?php echo url('pages/doi_tuyen.php'); ?>">Đội tuyển</a></li>
             <li class="breadcrumb-item active"><?php echo escape_html($doi_tuyen['ten_doi']); ?></li>
         </ol>
     </nav>
@@ -110,7 +110,7 @@ try {
                             <p class="mb-2">
                                 <span class="badge bg-primary"><?php echo escape_html($tuyen_thu['vai_tro']); ?></span>
                             </p>
-                            <a href="chi_tiet_tt.php?id=<?php echo $tuyen_thu['id']; ?>" class="btn btn-sm btn-outline-primary">
+                            <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tuyen_thu['id']); ?>" class="btn btn-sm btn-outline-primary">
                                 Xem chi tiết
                             </a>
                         </div>
@@ -146,7 +146,7 @@ try {
                         <?php foreach ($ket_qua_giai_dau as $ket_qua): ?>
                         <tr>
                             <td>
-                                <a href="chi_tiet_gd.php?id=<?php echo $ket_qua['id_giai_dau']; ?>">
+                                <a href="<?php echo url('pages/chi_tiet_gd.php?id=' . $ket_qua['id_giai_dau']); ?>">
                                     <?php echo escape_html($ket_qua['ten_giai']); ?>
                                 </a>
                             </td>
