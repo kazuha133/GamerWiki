@@ -147,6 +147,8 @@ if ($action === 'list') {
                                 <td>
                                     <?php if ($nd['vai_tro'] === 'admin'): ?>
                                         <span class="badge bg-danger">Admin</span>
+                                    <?php elseif ($nd['vai_tro'] === 'customer'): ?>
+                                        <span class="badge bg-success">Customer</span>
                                     <?php else: ?>
                                         <span class="badge bg-secondary">User</span>
                                     <?php endif; ?>
@@ -223,6 +225,7 @@ if ($action === 'list') {
                             <label for="vai_tro" class="form-label">Vai trò <span class="text-danger">*</span></label>
                             <select class="form-select" id="vai_tro" name="vai_tro" required>
                                 <option value="user" <?php echo ($nguoi_dung_data && $nguoi_dung_data['vai_tro'] === 'user') ? 'selected' : ''; ?>>User</option>
+                                <option value="customer" <?php echo ($nguoi_dung_data && $nguoi_dung_data['vai_tro'] === 'customer') ? 'selected' : ''; ?>>Customer</option>
                                 <option value="admin" <?php echo ($nguoi_dung_data && $nguoi_dung_data['vai_tro'] === 'admin') ? 'selected' : ''; ?>>Admin</option>
                             </select>
                         </div>

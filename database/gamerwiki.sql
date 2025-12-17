@@ -9,7 +9,7 @@ CREATE TABLE nguoi_dung (
     ten_dang_nhap VARCHAR(50) UNIQUE NOT NULL,
     mat_khau VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    vai_tro ENUM('admin', 'user') DEFAULT 'user',
+    vai_tro ENUM('admin', 'customer', 'user') DEFAULT 'user',
     trang_thai ENUM('active', 'inactive') DEFAULT 'active',
     ngay_tao DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_ten_dang_nhap (ten_dang_nhap),

@@ -2,7 +2,7 @@
 $page_title = 'Quản lý tuyển thủ';
 require_once __DIR__ . '/../includes/header.php';
 
-yeu_cau_admin();
+yeu_cau_admin_hoac_customer();
 
 $success = '';
 $error = '';
