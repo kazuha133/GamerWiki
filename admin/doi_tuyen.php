@@ -2,8 +2,8 @@
 $page_title = 'Quản lý đội tuyển';
 require_once __DIR__ . '/../includes/header.php';
 
-// Require admin privileges
-yeu_cau_admin();
+// Require admin or customer privileges
+yeu_cau_admin_hoac_customer();
 
 $success = '';
 $error = '';

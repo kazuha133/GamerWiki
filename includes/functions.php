@@ -40,6 +40,31 @@ function yeu_cau_admin() {
     }
 }
 
+// Kiểm tra quyền customer
+function kiem_tra_customer() {
+    khoi_tao_session();
+    return isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'customer';
+}
+
+// Kiểm tra có phải admin hoặc customer
+function kiem_tra_admin_hoac_customer() {
+    return kiem_tra_admin() || kiem_tra_customer();
+}
+
+// Yêu cầu quyền admin hoặc customer
+function yeu_cau_admin_hoac_customer() {
+    yeu_cau_dang_nhap();
+    if (!kiem_tra_admin_hoac_customer()) {
+        header('Location: ' . url('index.php'));
+        exit();
+    }
+}
+
+// Kiểm tra có quyền quản lý CRUD không (admin hoặc customer)
+function co_quyen_quan_ly() {
+    return kiem_tra_admin() || kiem_tra_customer();
+}
+
 // Escape HTML để tránh XSS
 function escape_html($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');

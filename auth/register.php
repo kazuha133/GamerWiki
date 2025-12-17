@@ -14,6 +14,7 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ten_dang_nhap = sanitize_input($_POST['ten_dang_nhap'] ?? '');
     $email = sanitize_input($_POST['email'] ?? '');
+    $vai_tro = sanitize_input($_POST['vai_tro'] ?? 'user');
     $mat_khau = $_POST['mat_khau'] ?? '';
     $xac_nhan_mat_khau = $_POST['xac_nhan_mat_khau'] ?? '';
     
@@ -42,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     // Tạo tài khoản mới
                     $mat_khau_hash = password_hash($mat_khau, PASSWORD_DEFAULT);
-                    $stmt = $conn->prepare("INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, email, vai_tro, trang_thai) VALUES (?, ?, ?, 'user', 'active')");
-                    $stmt->execute([$ten_dang_nhap, $mat_khau_hash, $email]);
+                    $stmt = $conn->prepare("INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, email, vai_tro, trang_thai) VALUES (?, ?, ?, ?, 'active')");
+                    $stmt->execute([$ten_dang_nhap, $mat_khau_hash, $email, $vai_tro]);
                     
                     $success = 'Đăng ký thành công! Vui lòng đăng nhập.';
                     $ten_dang_nhap = $email = '';
@@ -84,6 +85,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" 
                                    value="<?php echo isset($email) ? escape_html($email) : ''; ?>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="vai_tro" class="form-label">Loại tài khoản</label>
+                            <select class="form-select" id="vai_tro" name="vai_tro" required>
+                                <option value="user" <?php echo (isset($vai_tro) && $vai_tro === 'user') ? 'selected' : ''; ?>>
+                                    Người dùng (chỉ xem)
+                                </option>
+                                <option value="customer" <?php echo (isset($vai_tro) && $vai_tro === 'customer') ? 'selected' : ''; ?>>
+                                    Customer (có quyền quản lý)
+                                </option>
+                            </select>
+                            <div class="form-text">Customer có quyền thêm/sửa/xóa đội tuyển, tuyển thủ và giải đấu</div>
                         </div>
                         
                         <div class="mb-3">
