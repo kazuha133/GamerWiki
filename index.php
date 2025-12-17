@@ -42,7 +42,7 @@ try {
             <div class="col-md-8">
                 <h1 class="display-4 fw-bold"><i class="bi bi-trophy-fill"></i> Chào mừng đến với GamerWiki</h1>
                 <p class="lead">Hệ thống quản lý đội tuyển Esport chuyên nghiệp - Nơi cập nhật thông tin đầy đủ về các đội tuyển, tuyển thủ và giải đấu hàng đầu thế giới.</p>
-                <a href="/pages/doi_tuyen.php" class="btn btn-light btn-lg mt-3">Khám phá ngay</a>
+                <a href="<?php echo url('pages/doi_tuyen.php'); ?>" class="btn btn-light btn-lg mt-3">Khám phá ngay</a>
             </div>
             <div class="col-md-4 text-center">
                 <i class="bi bi-controller" style="font-size: 150px;"></i>
@@ -107,7 +107,7 @@ try {
                         <i class="bi bi-calendar"></i> <?php echo escape_html($doi['nam_thanh_lap']); ?>
                     </p>
                     <p class="card-text"><?php echo escape_html(substr($doi['thanh_tich'], 0, 100)) . '...'; ?></p>
-                    <a href="/pages/chi_tiet_dt.php?id=<?php echo $doi['id']; ?>" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                    <a href="<?php echo url('pages/chi_tiet_dt.php?id=' . $doi['id']); ?>" class="btn btn-primary btn-sm">Xem chi tiết</a>
                 </div>
             </div>
         </div>
@@ -131,7 +131,7 @@ try {
                     <p class="mb-1"><i class="bi bi-calendar"></i> <?php echo format_ngay($giai['thoi_gian_bat_dau']); ?></p>
                     <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> <?php echo escape_html($giai['dia_diem']); ?></p>
                     <p class="mb-3"><i class="bi bi-currency-dollar"></i> <?php echo escape_html($giai['giai_thuong']); ?></p>
-                    <a href="/pages/chi_tiet_gd.php?id=<?php echo $giai['id']; ?>" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                    <a href="<?php echo url('pages/chi_tiet_gd.php?id=' . $giai['id']); ?>" class="btn btn-primary btn-sm">Xem chi tiết</a>
                 </div>
             </div>
         </div>
@@ -152,7 +152,7 @@ try {
                     <h6 class="card-title mt-2"><?php echo escape_html($tuyen_thu['nickname']); ?></h6>
                     <p class="text-muted small mb-1"><?php echo escape_html($tuyen_thu['vai_tro']); ?></p>
                     <p class="text-muted small"><?php echo escape_html($tuyen_thu['ten_doi'] ?? 'Free Agent'); ?></p>
-                    <a href="/pages/chi_tiet_tt.php?id=<?php echo $tuyen_thu['id']; ?>" class="btn btn-primary btn-sm">Chi tiết</a>
+                    <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tuyen_thu['id']); ?>" class="btn btn-primary btn-sm">Chi tiết</a>
                 </div>
             </div>
         </div>

@@ -8,10 +8,10 @@
                 <div class="col-md-3">
                     <h6>Liên kết</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/index.php" class="text-white-50">Trang chủ</a></li>
-                        <li><a href="/pages/doi_tuyen.php" class="text-white-50">Đội tuyển</a></li>
-                        <li><a href="/pages/tuyen_thu.php" class="text-white-50">Tuyển thủ</a></li>
-                        <li><a href="/pages/giai_dau.php" class="text-white-50">Giải đấu</a></li>
+                        <li><a href="<?php echo url('index.php'); ?>" class="text-white-50">Trang chủ</a></li>
+                        <li><a href="<?php echo url('pages/doi_tuyen.php'); ?>" class="text-white-50">Đội tuyển</a></li>
+                        <li><a href="<?php echo url('pages/tuyen_thu.php'); ?>" class="text-white-50">Tuyển thủ</a></li>
+                        <li><a href="<?php echo url('pages/giai_dau.php'); ?>" class="text-white-50">Giải đấu</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -27,6 +27,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom JS -->
-    <script src="/assets/js/main.js"></script>
+    <script src="<?php echo asset('assets/js/main.js'); ?>"></script>
 </body>
 </html>

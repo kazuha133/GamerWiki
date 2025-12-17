@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 // Nếu đã đăng nhập, redirect về trang chủ
 if (kiem_tra_dang_nhap()) {
-    header('Location: /index.php');
+    header('Location: ' . url('index.php'));
     exit();
 }
 

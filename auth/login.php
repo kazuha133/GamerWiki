@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 // Nếu đã đăng nhập, redirect về trang chủ
 if (kiem_tra_dang_nhap()) {
-    header('Location: /index.php');
+    header('Location: ' . url('index.php'));
     exit();
 }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['ten_dang_nhap'] = $nguoi_dung['ten_dang_nhap'];
                     $_SESSION['vai_tro'] = $nguoi_dung['vai_tro'];
                     
-                    header('Location: /index.php');
+                    header('Location: ' . url('index.php'));
                     exit();
                 }
             } else {

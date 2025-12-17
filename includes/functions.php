@@ -26,7 +26,7 @@ function kiem_tra_admin() {
 // Redirect về trang login nếu chưa đăng nhập
 function yeu_cau_dang_nhap() {
     if (!kiem_tra_dang_nhap()) {
-        header('Location: /auth/login.php');
+        header('Location: ' . url('auth/login.php'));
         exit();
     }
 }
@@ -35,7 +35,7 @@ function yeu_cau_dang_nhap() {
 function yeu_cau_admin() {
     yeu_cau_dang_nhap();
     if (!kiem_tra_admin()) {
-        header('Location: /index.php');
+        header('Location: ' . url('index.php'));
         exit();
     }
 }
