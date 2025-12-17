@@ -1,0 +1,45 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.buildpath
+
+# PHP
+*.log
+
+# Upload directories (keep structure but ignore uploaded files)
+uploads/*
+!uploads/.gitkeep
+assets/img/logo/*
+!assets/img/logo/.gitkeep
+assets/img/players/*
+!assets/img/players/.gitkeep
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment specific files
+.env
+config.local.php
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Dependencies (if using Composer)
+vendor/
+
+# Session files
+sessions/

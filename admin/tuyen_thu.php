@@ -1,0 +1,233 @@
+<?php
+$page_title = 'Quản lý tuyển thủ';
+require_once __DIR__ . '/../includes/header.php';
+
+yeu_cau_admin();
+
+$success = '';
+$error = '';
+$action = $_GET['action'] ?? 'list';
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    
+    if (!kiem_tra_csrf_token($csrf_token)) {
+        $error = 'Token CSRF không hợp lệ.';
+    } else {
+        $ten_that = sanitize_input($_POST['ten_that'] ?? '');
+        $nickname = sanitize_input($_POST['nickname'] ?? '');
+        $vai_tro = sanitize_input($_POST['vai_tro'] ?? '');
+        $quoc_tich = sanitize_input($_POST['quoc_tich'] ?? '');
+        $ngay_sinh = sanitize_input($_POST['ngay_sinh'] ?? '');
+        $id_doi_tuyen = isset($_POST['id_doi_tuyen']) && $_POST['id_doi_tuyen'] !== '' ? (int)$_POST['id_doi_tuyen'] : null;
+        $mo_ta = sanitize_input($_POST['mo_ta'] ?? '');
+        
+        if (empty($ten_that) || empty($nickname) || empty($vai_tro)) {
+            $error = 'Vui lòng nhập đầy đủ thông tin bắt buộc.';
+        } else {
+            try {
+                if ($action === 'add') {
+                    $stmt = $conn->prepare("INSERT INTO tuyen_thu (ten_that, nickname, vai_tro, quoc_tich, ngay_sinh, id_doi_tuyen, mo_ta) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$ten_that, $nickname, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta]);
+                    $success = 'Thêm tuyển thủ thành công!';
+                    $action = 'list';
+                } elseif ($action === 'edit' && $id > 0) {
+                    $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
+                    $stmt->execute([$ten_that, $nickname, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
+                    $success = 'Cập nhật tuyển thủ thành công!';
+                    $action = 'list';
+                }
+            } catch (PDOException $e) {
+                $error = 'Lỗi: ' . $e->getMessage();
+            }
+        }
+    }
+}
+
+// Handle delete
+if ($action === 'delete' && $id > 0) {
+    try {
+        $stmt = $conn->prepare("DELETE FROM tuyen_thu WHERE id = ?");
+        $stmt->execute([$id]);
+        $success = 'Xóa tuyển thủ thành công!';
+        $action = 'list';
+    } catch (PDOException $e) {
+        $error = 'Không thể xóa tuyển thủ.';
+        $action = 'list';
+    }
+}
+
+// Get data for edit form
+$tuyen_thu_data = null;
+if ($action === 'edit' && $id > 0) {
+    $stmt = $conn->prepare("SELECT * FROM tuyen_thu WHERE id = ?");
+    $stmt->execute([$id]);
+    $tuyen_thu_data = $stmt->fetch();
+    if (!$tuyen_thu_data) {
+        $error = 'Không tìm thấy tuyển thủ.';
+        $action = 'list';
+    }
+}
+
+// Get teams for dropdown
+$stmt = $conn->query("SELECT id, ten_doi FROM doi_tuyen ORDER BY ten_doi ASC");
+$doi_tuyen_list_all = $stmt->fetchAll();
+
+// Get list for display
+if ($action === 'list') {
+    $stmt = $conn->query("SELECT tt.*, dt.ten_doi FROM tuyen_thu tt LEFT JOIN doi_tuyen dt ON tt.id_doi_tuyen = dt.id ORDER BY tt.nickname ASC");
+    $tuyen_thu_list = $stmt->fetchAll();
+}
+?>
+
+<?php include __DIR__ . '/../includes/navbar.php'; ?>
+
+<div class="container-fluid mt-4 mb-5">
+    <h1 class="mb-4"><i class="bi bi-person-badge-fill text-success"></i> Quản lý tuyển thủ</h1>
+    
+    <?php if ($success): ?>
+        <?php echo hien_thi_thong_bao($success, 'success'); ?>
+    <?php endif; ?>
+    
+    <?php if ($error): ?>
+        <?php echo hien_thi_thong_bao($error, 'error'); ?>
+    <?php endif; ?>
+    
+    <?php if ($action === 'list'): ?>
+        <!-- List View -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Danh sách tuyển thủ</h5>
+                <a href="?action=add" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Thêm mới
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nickname</th>
+                                <th>Tên thật</th>
+                                <th>Vai trò</th>
+                                <th>Quốc tịch</th>
+                                <th>Đội tuyển</th>
+                                <th>Ngày sinh</th>
+                                <th width="150">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($tuyen_thu_list as $tt): ?>
+                            <tr>
+                                <td><?php echo $tt['id']; ?></td>
+                                <td><strong><?php echo escape_html($tt['nickname']); ?></strong></td>
+                                <td><?php echo escape_html($tt['ten_that']); ?></td>
+                                <td><span class="badge bg-primary"><?php echo escape_html($tt['vai_tro']); ?></span></td>
+                                <td><?php echo escape_html($tt['quoc_tich']); ?></td>
+                                <td><?php echo escape_html($tt['ten_doi'] ?? '-'); ?></td>
+                                <td><?php echo format_ngay($tt['ngay_sinh']); ?></td>
+                                <td class="action-buttons">
+                                    <a href="?action=edit&id=<?php echo $tt['id']; ?>" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="?action=delete&id=<?php echo $tt['id']; ?>" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirmDelete('<?php echo escape_html($tt['nickname']); ?>')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    <a href="/pages/chi_tiet_tt.php?id=<?php echo $tt['id']; ?>" 
+                                       class="btn btn-sm btn-info" target="_blank">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    <?php elseif ($action === 'add' || $action === 'edit'): ?>
+        <!-- Add/Edit Form -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <?php echo $action === 'add' ? 'Thêm tuyển thủ mới' : 'Chỉnh sửa tuyển thủ'; ?>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="<?php echo tao_csrf_token(); ?>">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ten_that" class="form-label">Tên thật <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ten_that" name="ten_that" 
+                                   value="<?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['ten_that']) : ''; ?>" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="nickname" class="form-label">Nickname <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nickname" name="nickname" 
+                                   value="<?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['nickname']) : ''; ?>" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="vai_tro" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="vai_tro" name="vai_tro" 
+                                   value="<?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['vai_tro']) : ''; ?>" 
+                                   placeholder="VD: Top, Mid, ADC..." required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="quoc_tich" class="form-label">Quốc tịch</label>
+                            <input type="text" class="form-control" id="quoc_tich" name="quoc_tich" 
+                                   value="<?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['quoc_tich']) : ''; ?>">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="ngay_sinh" class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" 
+                                   value="<?php echo $tuyen_thu_data ? $tuyen_thu_data['ngay_sinh'] : ''; ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_doi_tuyen" class="form-label">Đội tuyển</label>
+                        <select class="form-select" id="id_doi_tuyen" name="id_doi_tuyen">
+                            <option value="">-- Free Agent --</option>
+                            <?php foreach ($doi_tuyen_list_all as $doi): ?>
+                            <option value="<?php echo $doi['id']; ?>" 
+                                    <?php echo ($tuyen_thu_data && $tuyen_thu_data['id_doi_tuyen'] == $doi['id']) ? 'selected' : ''; ?>>
+                                <?php echo escape_html($doi['ten_doi']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mo_ta" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="mo_ta" name="mo_ta" rows="4"><?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['mo_ta']) : ''; ?></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="?action=list" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> <?php echo $action === 'add' ? 'Thêm mới' : 'Cập nhật'; ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>
