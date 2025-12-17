@@ -32,9 +32,12 @@ define('SITE_URL', $protocol . '://' . $host . BASE_PATH);
 function url($path = '') {
     $path = ltrim($path, '/');
     if (empty($path)) {
-        return BASE_PATH . '/';
+        // Nếu không có path, trả về base path với trailing slash
+        // Đảm bảo không trả về '//' khi BASE_PATH rỗng
+        return BASE_PATH === '' ? '/' : BASE_PATH . '/';
     }
-    return BASE_PATH . '/' . $path;
+    // Kết hợp BASE_PATH với path, đảm bảo có đúng một '/' ở giữa
+    return BASE_PATH === '' ? '/' . $path : BASE_PATH . '/' . $path;
 }
 
 /**
