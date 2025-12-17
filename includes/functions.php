@@ -125,11 +125,21 @@ function kiem_tra_csrf_token($token) {
 // Pagination
 function tao_phan_trang($tong_ban_ghi, $ban_ghi_moi_trang, $trang_hien_tai) {
     $tong_trang = ceil($tong_ban_ghi / $ban_ghi_moi_trang);
+    
+    // Validate and sanitize current page
+    $trang_hien_tai = max(1, min((int)$trang_hien_tai, $tong_trang));
+    
+    // Preserve existing GET parameters except 'page'
+    $params = $_GET;
+    unset($params['page']);
+    
     $html = '<nav><ul class="pagination justify-content-center">';
     
     // Previous
     if ($trang_hien_tai > 1) {
-        $html .= '<li class="page-item"><a class="page-link" href="?page=' . ($trang_hien_tai - 1) . '">« Trước</a></li>';
+        $params['page'] = $trang_hien_tai - 1;
+        $query_string = http_build_query($params);
+        $html .= '<li class="page-item"><a class="page-link" href="?' . escape_html($query_string) . '">« Trước</a></li>';
     } else {
         $html .= '<li class="page-item disabled"><span class="page-link">« Trước</span></li>';
     }
@@ -139,13 +149,17 @@ function tao_phan_trang($tong_ban_ghi, $ban_ghi_moi_trang, $trang_hien_tai) {
         if ($i == $trang_hien_tai) {
             $html .= '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
         } else {
-            $html .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+            $params['page'] = $i;
+            $query_string = http_build_query($params);
+            $html .= '<li class="page-item"><a class="page-link" href="?' . escape_html($query_string) . '">' . $i . '</a></li>';
         }
     }
     
     // Next
     if ($trang_hien_tai < $tong_trang) {
-        $html .= '<li class="page-item"><a class="page-link" href="?page=' . ($trang_hien_tai + 1) . '">Sau »</a></li>';
+        $params['page'] = $trang_hien_tai + 1;
+        $query_string = http_build_query($params);
+        $html .= '<li class="page-item"><a class="page-link" href="?' . escape_html($query_string) . '">Sau »</a></li>';
     } else {
         $html .= '<li class="page-item disabled"><span class="page-link">Sau »</span></li>';
     }

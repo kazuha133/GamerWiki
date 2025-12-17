@@ -97,7 +97,11 @@ http://localhost/GamerWiki
 - **Username**: `admin`
 - **Password**: `admin123`
 
-**Lưu ý**: Nên đổi mật khẩu ngay sau khi đăng nhập lần đầu!
+**⚠️ LƯU Ý BẢO MẬT QUAN TRỌNG**: 
+- Mật khẩu mặc định này CHỈ dùng cho môi trường phát triển/test
+- **BẮT BUỘC** đổi mật khẩu ngay sau khi đăng nhập lần đầu
+- **KHÔNG BAO GIỜ** sử dụng mật khẩu mặc định này trong môi trường production
+- Nên xóa hoặc vô hiệu hóa tài khoản này sau khi tạo tài khoản admin mới với mật khẩu mạnh
 
 ## 📁 Cấu trúc thư mục
 

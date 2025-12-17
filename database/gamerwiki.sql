@@ -93,6 +93,8 @@ CREATE TABLE lich_su_chuyen_doi (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert admin mặc định (password: admin123)
+-- LƯU Ý BẢO MẬT: Đây là mật khẩu mặc định chỉ dùng cho môi trường phát triển/test
+-- PHẢI ĐỔI MẬT KHẨU NGAY SAU KHI ĐĂNG NHẬP LẦN ĐẦU trong môi trường production
 INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, email, vai_tro, trang_thai) 
 VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@gamerwiki.com', 'admin', 'active');
 
