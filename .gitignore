@@ -1,0 +1,33 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# PHP
+*.cache
+vendor/
+
+# Database
+*.sql.backup
+*.sql.gz
+
+# Uploads (if you add file upload feature)
+uploads/*
+!uploads/.gitkeep
+
+# Configuration backups
+config/*.backup
+config/*.bak
