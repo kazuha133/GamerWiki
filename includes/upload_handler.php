@@ -5,7 +5,8 @@
  */
 
 /**
- * Upload image with security validation
+ * Upload image with validation
+ * Validates: type, upload errors, file size, extension, and MIME type
  * 
  * @param array $file - $_FILES array element
  * @param string $type - 'logo' hoặc 'avatar'
@@ -59,30 +60,6 @@ function upload_image($file, $type, $old_file = null) {
     
     if (!$mime_type || !in_array($mime_type, $allowed_mime_types)) {
         return ['success' => false, 'error' => 'File không phải là ảnh hợp lệ.'];
-    }
-    
-    // Additional check: prevent malicious files disguised as images
-    // Check first 1KB for various dangerous patterns
-    $file_handle = fopen($file['tmp_name'], 'rb');
-    if ($file_handle === false) {
-        return ['success' => false, 'error' => 'Không thể đọc file.'];
-    }
-    
-    $file_content = fread($file_handle, 1024);
-    fclose($file_handle);
-    
-    // Check for various dangerous patterns and null bytes
-    if ($file_content === false ||
-        preg_match('/<\?php/i', $file_content) || 
-        preg_match('/<script[^>]*>/i', $file_content) ||
-        preg_match('/<iframe[^>]*>/i', $file_content) ||
-        preg_match('/<object[^>]*>/i', $file_content) ||
-        preg_match('/<embed[^>]*>/i', $file_content) ||
-        preg_match('/<applet[^>]*>/i', $file_content) ||
-        preg_match('/javascript:/i', $file_content) ||
-        preg_match('/vbscript:/i', $file_content) ||
-        strpos($file_content, "\0") !== false) {
-        return ['success' => false, 'error' => 'File chứa nội dung không hợp lệ.'];
     }
     
     // Generate secure unique filename
