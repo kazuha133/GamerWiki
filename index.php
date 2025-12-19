@@ -149,7 +149,7 @@ try {
         <div class="col-md-2 mb-4">
             <div class="card shadow-sm h-100 text-center">
                 <div class="card-body">
-                    <?php if (!empty($tuyen_thu['anh_dai_dien']) && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
+                    <?php if ($tuyen_thu['anh_dai_dien'] && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
                         <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
                              class="player-avatar-small rounded-circle mb-2"
                              alt="<?php echo escape_html($tuyen_thu['nickname']); ?>">
