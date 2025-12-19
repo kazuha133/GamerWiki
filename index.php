@@ -151,11 +151,10 @@ try {
                 <div class="card-body">
                     <?php if (!empty($tuyen_thu['anh_dai_dien']) && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
                         <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
-                             class="rounded-circle mb-2" 
-                             style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #28a745;"
+                             class="player-avatar-small rounded-circle mb-2"
                              alt="<?php echo escape_html($tuyen_thu['nickname']); ?>">
                     <?php else: ?>
-                        <i class="bi bi-person-circle text-secondary" style="font-size: 5rem;"></i>
+                        <i class="bi bi-person-circle player-avatar-fallback text-secondary"></i>
                     <?php endif; ?>
                     <h6 class="card-title mt-2"><?php echo escape_html($tuyen_thu['nickname']); ?></h6>
                     <p class="text-muted small mb-1"><?php echo escape_html($tuyen_thu['vai_tro']); ?></p>
