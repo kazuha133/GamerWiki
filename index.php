@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Trang chủ';
 require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/upload_handler.php';
 
 // Lấy thống kê
 try {
@@ -148,11 +149,17 @@ try {
         <div class="col-md-2 mb-4">
             <div class="card shadow-sm h-100 text-center">
                 <div class="card-body">
-                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                    <?php if ($tuyen_thu['anh_dai_dien'] && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
+                        <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
+                             class="player-avatar-small rounded-circle mb-2"
+                             alt="<?php echo escape_html($tuyen_thu['nickname']); ?>">
+                    <?php else: ?>
+                        <i class="bi bi-person-circle player-avatar-fallback text-secondary"></i>
+                    <?php endif; ?>
                     <h6 class="card-title mt-2"><?php echo escape_html($tuyen_thu['nickname']); ?></h6>
                     <p class="text-muted small mb-1"><?php echo escape_html($tuyen_thu['vai_tro']); ?></p>
                     <p class="text-muted small"><?php echo escape_html($tuyen_thu['ten_doi'] ?? 'Free Agent'); ?></p>
-                    <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tuyen_thu['id']); ?>" class="btn btn-primary btn-sm">Chi tiết</a>
+                    <a href="<?php echo url('pages/chi_tiet_tt.php?id=' . $tuyen_thu['id']); ?>" class="btn btn-success btn-sm">Chi tiết</a>
                 </div>
             </div>
         </div>

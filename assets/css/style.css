@@ -323,3 +323,23 @@ footer a:hover {
     }
 }
 
+/* Player avatar styling - Homepage and listings */
+.player-avatar-small {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 3px solid var(--success-color);
+}
+
+.player-avatar-medium {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 3px solid var(--success-color);
+}
+
+.player-avatar-fallback {
+    font-size: 4rem;
+    color: var(--secondary-color);
+}
+
