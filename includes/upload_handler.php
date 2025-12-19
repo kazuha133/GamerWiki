@@ -45,7 +45,6 @@ function upload_image($file, $type, $old_file = null) {
     // Validate MIME type (real file type check, not just extension)
     $allowed_mime_types = [
         'image/jpeg',
-        'image/jpg', 
         'image/png',
         'image/gif'
     ];
@@ -59,7 +58,8 @@ function upload_image($file, $type, $old_file = null) {
     }
     
     // Additional check: prevent PHP files disguised as images
-    $file_content = file_get_contents($file['tmp_name'], false, null, 0, 100);
+    // Check more content for better security (first 1KB)
+    $file_content = file_get_contents($file['tmp_name'], false, null, 0, 1024);
     if (preg_match('/<\?php/i', $file_content) || preg_match('/<script/i', $file_content)) {
         return ['success' => false, 'error' => 'File chứa nội dung không hợp lệ.'];
     }
