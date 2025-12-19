@@ -5,7 +5,8 @@
  */
 
 /**
- * Upload image with security validation
+ * Upload image with validation
+ * Validates: type, upload errors, file size, extension, and MIME type
  * 
  * @param array $file - $_FILES array element
  * @param string $type - 'logo' hoặc 'avatar'
