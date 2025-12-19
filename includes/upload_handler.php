@@ -61,14 +61,27 @@ function upload_image($file, $type, $old_file = null) {
         return ['success' => false, 'error' => 'File không phải là ảnh hợp lệ.'];
     }
     
-    // Additional check: prevent PHP files disguised as images
-    // Check more content for better security (first 1KB)
-    // Check for various dangerous patterns
-    $file_content = file_get_contents($file['tmp_name'], false, null, 0, 1024);
-    if (preg_match('/<\?php/i', $file_content) || 
+    // Additional check: prevent malicious files disguised as images
+    // Check first 1KB for various dangerous patterns
+    $file_handle = fopen($file['tmp_name'], 'rb');
+    if ($file_handle === false) {
+        return ['success' => false, 'error' => 'Không thể đọc file.'];
+    }
+    
+    $file_content = fread($file_handle, 1024);
+    fclose($file_handle);
+    
+    // Check for various dangerous patterns and null bytes
+    if ($file_content === false ||
+        preg_match('/<\?php/i', $file_content) || 
         preg_match('/<script[^>]*>/i', $file_content) ||
         preg_match('/<iframe[^>]*>/i', $file_content) ||
-        preg_match('/<object[^>]*>/i', $file_content)) {
+        preg_match('/<object[^>]*>/i', $file_content) ||
+        preg_match('/<embed[^>]*>/i', $file_content) ||
+        preg_match('/<applet[^>]*>/i', $file_content) ||
+        preg_match('/javascript:/i', $file_content) ||
+        preg_match('/vbscript:/i', $file_content) ||
+        strpos($file_content, "\0") !== false) {
         return ['success' => false, 'error' => 'File chứa nội dung không hợp lệ.'];
     }
     
