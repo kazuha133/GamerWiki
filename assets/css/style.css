@@ -328,18 +328,18 @@ footer a:hover {
     width: 80px;
     height: 80px;
     object-fit: cover;
-    border: 3px solid #28a745;
+    border: 3px solid var(--success-color);
 }
 
 .player-avatar-medium {
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border: 3px solid #28a745;
+    border: 3px solid var(--success-color);
 }
 
 .player-avatar-fallback {
     font-size: 5rem;
-    color: #6c757d;
+    color: var(--secondary-color);
 }
 
