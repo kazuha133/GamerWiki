@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Chi tiết tuyển thủ';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -66,7 +67,14 @@ try {
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 text-center">
-                    <i class="bi bi-person-circle text-secondary" style="font-size: 200px;"></i>
+                    <?php if ($tuyen_thu['anh_dai_dien'] && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
+                        <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
+                             alt="<?php echo escape_html($tuyen_thu['nickname']); ?>" 
+                             class="rounded-circle img-thumbnail" 
+                             style="width: 200px; height: 200px; object-fit: cover;">
+                    <?php else: ?>
+                        <i class="bi bi-person-circle text-secondary" style="font-size: 200px;"></i>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-9">
                     <h1 class="mb-3"><?php echo escape_html($tuyen_thu['nickname']); ?></h1>

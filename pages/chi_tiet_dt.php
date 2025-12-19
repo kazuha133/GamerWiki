@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Chi tiết đội tuyển';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -63,7 +64,13 @@ try {
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 text-center">
-                    <i class="bi bi-shield-fill text-primary" style="font-size: 150px;"></i>
+                    <?php if ($doi_tuyen['logo'] && image_exists($doi_tuyen['logo'], 'logo')): ?>
+                        <img src="<?php echo get_image_url($doi_tuyen['logo'], 'logo'); ?>" 
+                             alt="<?php echo escape_html($doi_tuyen['ten_doi']); ?>" 
+                             class="img-fluid" style="max-width: 200px;">
+                    <?php else: ?>
+                        <i class="bi bi-shield-fill text-primary" style="font-size: 150px;"></i>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-9">
                     <h1 class="mb-3"><?php echo escape_html($doi_tuyen['ten_doi']); ?></h1>
@@ -104,7 +111,14 @@ try {
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <div class="card-body text-center">
-                            <i class="bi bi-person-circle text-secondary" style="font-size: 3rem;"></i>
+                            <?php if ($tuyen_thu['anh_dai_dien'] && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
+                                <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
+                                     alt="<?php echo escape_html($tuyen_thu['nickname']); ?>" 
+                                     class="rounded-circle img-thumbnail mb-2" 
+                                     style="width: 100px; height: 100px; object-fit: cover;">
+                            <?php else: ?>
+                                <i class="bi bi-person-circle text-secondary" style="font-size: 3rem;"></i>
+                            <?php endif; ?>
                             <h5 class="mt-2 mb-1"><?php echo escape_html($tuyen_thu['nickname']); ?></h5>
                             <p class="text-muted mb-1"><?php echo escape_html($tuyen_thu['ten_that']); ?></p>
                             <p class="mb-2">
