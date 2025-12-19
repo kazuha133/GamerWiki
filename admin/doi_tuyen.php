@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare("SELECT logo FROM doi_tuyen WHERE id = ?");
                 $stmt->execute([$id]);
                 $old_data = $stmt->fetch();
-                $old_logo = $old_data['logo'] ?? null;
+                $old_logo = ($old_data && isset($old_data['logo'])) ? $old_data['logo'] : null;
             }
             
             // Check if new file was uploaded

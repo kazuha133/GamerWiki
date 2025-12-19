@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare("SELECT anh_dai_dien FROM tuyen_thu WHERE id = ?");
                 $stmt->execute([$id]);
                 $old_data = $stmt->fetch();
-                $old_avatar = $old_data['anh_dai_dien'] ?? null;
+                $old_avatar = ($old_data && isset($old_data['anh_dai_dien'])) ? $old_data['anh_dai_dien'] : null;
             }
             
             // Check if new file was uploaded

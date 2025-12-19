@@ -20,11 +20,11 @@ function upload_image($file, $type, $old_file = null) {
     }
     
     // Check if file was uploaded
-    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
-        if ($file['error'] === UPLOAD_ERR_NO_FILE) {
+    if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+        if (isset($file['error']) && $file['error'] === UPLOAD_ERR_NO_FILE) {
             return ['success' => false, 'error' => 'Không có file được chọn.'];
         }
-        return ['success' => false, 'error' => 'Lỗi khi upload file. Mã lỗi: ' . $file['error']];
+        return ['success' => false, 'error' => 'Lỗi khi upload file. Mã lỗi: ' . ($file['error'] ?? 'unknown')];
     }
     
     // Validate file size (max 5MB)
@@ -50,17 +50,25 @@ function upload_image($file, $type, $old_file = null) {
     ];
     
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    if ($finfo === false) {
+        return ['success' => false, 'error' => 'Không thể xác thực loại file.'];
+    }
+    
     $mime_type = finfo_file($finfo, $file['tmp_name']);
     finfo_close($finfo);
     
-    if (!in_array($mime_type, $allowed_mime_types)) {
+    if (!$mime_type || !in_array($mime_type, $allowed_mime_types)) {
         return ['success' => false, 'error' => 'File không phải là ảnh hợp lệ.'];
     }
     
     // Additional check: prevent PHP files disguised as images
     // Check more content for better security (first 1KB)
+    // Check for various dangerous patterns
     $file_content = file_get_contents($file['tmp_name'], false, null, 0, 1024);
-    if (preg_match('/<\?php/i', $file_content) || preg_match('/<script/i', $file_content)) {
+    if (preg_match('/<\?php/i', $file_content) || 
+        preg_match('/<script[^>]*>/i', $file_content) ||
+        preg_match('/<iframe[^>]*>/i', $file_content) ||
+        preg_match('/<object[^>]*>/i', $file_content)) {
         return ['success' => false, 'error' => 'File chứa nội dung không hợp lệ.'];
     }
     
