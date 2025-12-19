@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Quản lý tuyển thủ';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 yeu_cau_admin_hoac_customer();
 
@@ -27,20 +28,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($ten_that) || empty($nickname) || empty($vai_tro)) {
             $error = 'Vui lòng nhập đầy đủ thông tin bắt buộc.';
         } else {
-            try {
-                if ($action === 'add') {
-                    $stmt = $conn->prepare("INSERT INTO tuyen_thu (ten_that, nickname, vai_tro, quoc_tich, ngay_sinh, id_doi_tuyen, mo_ta) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$ten_that, $nickname, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta]);
-                    $success = 'Thêm tuyển thủ thành công!';
-                    $action = 'list';
-                } elseif ($action === 'edit' && $id > 0) {
-                    $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
-                    $stmt->execute([$ten_that, $nickname, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
-                    $success = 'Cập nhật tuyển thủ thành công!';
-                    $action = 'list';
+            // Handle avatar upload
+            $avatar_filename = null;
+            $old_avatar = null;
+            
+            // Get old avatar for edit action
+            if ($action === 'edit' && $id > 0) {
+                $stmt = $conn->prepare("SELECT anh_dai_dien FROM tuyen_thu WHERE id = ?");
+                $stmt->execute([$id]);
+                $old_data = $stmt->fetch();
+                $old_avatar = ($old_data && isset($old_data['anh_dai_dien'])) ? $old_data['anh_dai_dien'] : null;
+            }
+            
+            // Check if new file was uploaded
+            if (isset($_FILES['anh_dai_dien']) && $_FILES['anh_dai_dien']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $upload_result = upload_image($_FILES['anh_dai_dien'], 'avatar', $old_avatar);
+                
+                if ($upload_result['success']) {
+                    $avatar_filename = $upload_result['filename'];
+                } else {
+                    $error = $upload_result['error'];
                 }
-            } catch (PDOException $e) {
-                $error = 'Lỗi: ' . $e->getMessage();
+            } else {
+                // Keep old avatar if no new file uploaded
+                $avatar_filename = $old_avatar;
+            }
+            
+            // Only proceed if no upload error
+            if (empty($error)) {
+                try {
+                    if ($action === 'add') {
+                        $stmt = $conn->prepare("INSERT INTO tuyen_thu (ten_that, nickname, anh_dai_dien, vai_tro, quoc_tich, ngay_sinh, id_doi_tuyen, mo_ta) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$ten_that, $nickname, $avatar_filename, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta]);
+                        $success = 'Thêm tuyển thủ thành công!';
+                        $action = 'list';
+                    } elseif ($action === 'edit' && $id > 0) {
+                        $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, anh_dai_dien = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
+                        $stmt->execute([$ten_that, $nickname, $avatar_filename, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
+                        $success = 'Cập nhật tuyển thủ thành công!';
+                        $action = 'list';
+                    }
+                } catch (PDOException $e) {
+                    $error = 'Lỗi: ' . $e->getMessage();
+                    // Delete uploaded file if database operation failed
+                    if ($avatar_filename && $avatar_filename !== $old_avatar) {
+                        delete_image($avatar_filename, 'avatar');
+                    }
+                }
             }
         }
     }
@@ -49,8 +83,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle delete
 if ($action === 'delete' && $id > 0) {
     try {
+        // Get avatar filename before deleting
+        $stmt = $conn->prepare("SELECT anh_dai_dien FROM tuyen_thu WHERE id = ?");
+        $stmt->execute([$id]);
+        $player_data = $stmt->fetch();
+        
+        // Delete from database
         $stmt = $conn->prepare("DELETE FROM tuyen_thu WHERE id = ?");
         $stmt->execute([$id]);
+        
+        // Delete avatar file if exists
+        if ($player_data && $player_data['anh_dai_dien']) {
+            delete_image($player_data['anh_dai_dien'], 'avatar');
+        }
+        
         $success = 'Xóa tuyển thủ thành công!';
         $action = 'list';
     } catch (PDOException $e) {
@@ -110,6 +156,7 @@ if ($action === 'list') {
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Ảnh</th>
                                 <th>Nickname</th>
                                 <th>Tên thật</th>
                                 <th>Vai trò</th>
@@ -123,6 +170,15 @@ if ($action === 'list') {
                             <?php foreach ($tuyen_thu_list as $tt): ?>
                             <tr>
                                 <td><?php echo $tt['id']; ?></td>
+                                <td>
+                                    <?php if ($tt['anh_dai_dien'] && image_exists($tt['anh_dai_dien'], 'avatar')): ?>
+                                        <img src="<?php echo get_image_url($tt['anh_dai_dien'], 'avatar'); ?>" 
+                                             alt="Avatar" class="rounded-circle img-thumbnail" 
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <i class="bi bi-person-circle text-muted" style="font-size: 2rem;"></i>
+                                    <?php endif; ?>
+                                </td>
                                 <td><strong><?php echo escape_html($tt['nickname']); ?></strong></td>
                                 <td><?php echo escape_html($tt['ten_that']); ?></td>
                                 <td><span class="badge bg-primary"><?php echo escape_html($tt['vai_tro']); ?></span></td>
@@ -160,7 +216,7 @@ if ($action === 'list') {
                 </h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="<?php echo tao_csrf_token(); ?>">
                     
                     <div class="row">
@@ -175,6 +231,19 @@ if ($action === 'list') {
                             <input type="text" class="form-control" id="nickname" name="nickname" 
                                    value="<?php echo $tuyen_thu_data ? escape_html($tuyen_thu_data['nickname']) : ''; ?>" required>
                         </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="anh_dai_dien" class="form-label">Ảnh đại diện</label>
+                        <?php if ($tuyen_thu_data && $tuyen_thu_data['anh_dai_dien'] && image_exists($tuyen_thu_data['anh_dai_dien'], 'avatar')): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo get_image_url($tuyen_thu_data['anh_dai_dien'], 'avatar'); ?>" 
+                                     alt="Ảnh hiện tại" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                <p class="text-muted small mb-0">Ảnh hiện tại</p>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" id="anh_dai_dien" name="anh_dai_dien" accept="image/jpeg,image/jpg,image/png,image/gif">
+                        <small class="form-text text-muted">Chấp nhận: JPG, JPEG, PNG, GIF. Tối đa 5MB.</small>
                     </div>
                     
                     <div class="row">

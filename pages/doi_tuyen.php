@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Danh sách đội tuyển';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 // Pagination
 $ban_ghi_moi_trang = 9;
@@ -76,7 +77,13 @@ try {
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <div class="text-center mb-3">
-                            <i class="bi bi-shield-fill text-primary" style="font-size: 4rem;"></i>
+                            <?php if ($doi['logo'] && image_exists($doi['logo'], 'logo')): ?>
+                                <img src="<?php echo get_image_url($doi['logo'], 'logo'); ?>" 
+                                     alt="<?php echo escape_html($doi['ten_doi']); ?>" 
+                                     class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+                            <?php else: ?>
+                                <i class="bi bi-shield-fill text-primary" style="font-size: 4rem;"></i>
+                            <?php endif; ?>
                         </div>
                         <h5 class="card-title text-center"><?php echo escape_html($doi['ten_doi']); ?></h5>
                         <hr>

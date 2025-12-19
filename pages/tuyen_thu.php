@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Danh sách tuyển thủ';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 // Pagination
 $ban_ghi_moi_trang = 12;
@@ -89,7 +90,14 @@ try {
             <div class="col-md-3 mb-4">
                 <div class="card shadow-sm h-100 text-center">
                     <div class="card-body">
-                        <i class="bi bi-person-circle text-secondary" style="font-size: 5rem;"></i>
+                        <?php if ($tuyen_thu['anh_dai_dien'] && image_exists($tuyen_thu['anh_dai_dien'], 'avatar')): ?>
+                            <img src="<?php echo get_image_url($tuyen_thu['anh_dai_dien'], 'avatar'); ?>" 
+                                 alt="<?php echo escape_html($tuyen_thu['nickname']); ?>" 
+                                 class="rounded-circle img-thumbnail mb-2" 
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        <?php else: ?>
+                            <i class="bi bi-person-circle text-secondary" style="font-size: 5rem;"></i>
+                        <?php endif; ?>
                         <h5 class="card-title mt-2"><?php echo escape_html($tuyen_thu['nickname']); ?></h5>
                         <p class="text-muted small mb-1"><?php echo escape_html($tuyen_thu['ten_that']); ?></p>
                         <p class="mb-2">

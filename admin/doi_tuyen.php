@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Quản lý đội tuyển';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/upload_handler.php';
 
 // Require admin or customer privileges
 yeu_cau_admin_hoac_customer();
@@ -26,20 +27,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($ten_doi) || empty($quoc_gia)) {
             $error = 'Vui lòng nhập đầy đủ thông tin bắt buộc.';
         } else {
-            try {
-                if ($action === 'add') {
-                    $stmt = $conn->prepare("INSERT INTO doi_tuyen (ten_doi, quoc_gia, nam_thanh_lap, thanh_tich, mo_ta) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$ten_doi, $quoc_gia, $nam_thanh_lap, $thanh_tich, $mo_ta]);
-                    $success = 'Thêm đội tuyển thành công!';
-                    $action = 'list';
-                } elseif ($action === 'edit' && $id > 0) {
-                    $stmt = $conn->prepare("UPDATE doi_tuyen SET ten_doi = ?, quoc_gia = ?, nam_thanh_lap = ?, thanh_tich = ?, mo_ta = ? WHERE id = ?");
-                    $stmt->execute([$ten_doi, $quoc_gia, $nam_thanh_lap, $thanh_tich, $mo_ta, $id]);
-                    $success = 'Cập nhật đội tuyển thành công!';
-                    $action = 'list';
+            // Handle logo upload
+            $logo_filename = null;
+            $old_logo = null;
+            
+            // Get old logo for edit action
+            if ($action === 'edit' && $id > 0) {
+                $stmt = $conn->prepare("SELECT logo FROM doi_tuyen WHERE id = ?");
+                $stmt->execute([$id]);
+                $old_data = $stmt->fetch();
+                $old_logo = ($old_data && isset($old_data['logo'])) ? $old_data['logo'] : null;
+            }
+            
+            // Check if new file was uploaded
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $upload_result = upload_image($_FILES['logo'], 'logo', $old_logo);
+                
+                if ($upload_result['success']) {
+                    $logo_filename = $upload_result['filename'];
+                } else {
+                    $error = $upload_result['error'];
                 }
-            } catch (PDOException $e) {
-                $error = 'Lỗi: ' . $e->getMessage();
+            } else {
+                // Keep old logo if no new file uploaded
+                $logo_filename = $old_logo;
+            }
+            
+            // Only proceed if no upload error
+            if (empty($error)) {
+                try {
+                    if ($action === 'add') {
+                        $stmt = $conn->prepare("INSERT INTO doi_tuyen (ten_doi, logo, quoc_gia, nam_thanh_lap, thanh_tich, mo_ta) VALUES (?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$ten_doi, $logo_filename, $quoc_gia, $nam_thanh_lap, $thanh_tich, $mo_ta]);
+                        $success = 'Thêm đội tuyển thành công!';
+                        $action = 'list';
+                    } elseif ($action === 'edit' && $id > 0) {
+                        $stmt = $conn->prepare("UPDATE doi_tuyen SET ten_doi = ?, logo = ?, quoc_gia = ?, nam_thanh_lap = ?, thanh_tich = ?, mo_ta = ? WHERE id = ?");
+                        $stmt->execute([$ten_doi, $logo_filename, $quoc_gia, $nam_thanh_lap, $thanh_tich, $mo_ta, $id]);
+                        $success = 'Cập nhật đội tuyển thành công!';
+                        $action = 'list';
+                    }
+                } catch (PDOException $e) {
+                    $error = 'Lỗi: ' . $e->getMessage();
+                    // Delete uploaded file if database operation failed
+                    if ($logo_filename && $logo_filename !== $old_logo) {
+                        delete_image($logo_filename, 'logo');
+                    }
+                }
             }
         }
     }
@@ -48,8 +82,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle delete
 if ($action === 'delete' && $id > 0) {
     try {
+        // Get logo filename before deleting
+        $stmt = $conn->prepare("SELECT logo FROM doi_tuyen WHERE id = ?");
+        $stmt->execute([$id]);
+        $team_data = $stmt->fetch();
+        
+        // Delete from database
         $stmt = $conn->prepare("DELETE FROM doi_tuyen WHERE id = ?");
         $stmt->execute([$id]);
+        
+        // Delete logo file if exists
+        if ($team_data && $team_data['logo']) {
+            delete_image($team_data['logo'], 'logo');
+        }
+        
         $success = 'Xóa đội tuyển thành công!';
         $action = 'list';
     } catch (PDOException $e) {
@@ -105,6 +151,7 @@ if ($action === 'list') {
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Logo</th>
                                 <th>Tên đội</th>
                                 <th>Quốc gia</th>
                                 <th>Năm TL</th>
@@ -117,6 +164,14 @@ if ($action === 'list') {
                             <?php foreach ($doi_tuyen_list as $doi): ?>
                             <tr>
                                 <td><?php echo $doi['id']; ?></td>
+                                <td>
+                                    <?php if ($doi['logo'] && image_exists($doi['logo'], 'logo')): ?>
+                                        <img src="<?php echo get_image_url($doi['logo'], 'logo'); ?>" 
+                                             alt="Logo" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <i class="bi bi-shield-fill text-muted" style="font-size: 2rem;"></i>
+                                    <?php endif; ?>
+                                </td>
                                 <td><strong><?php echo escape_html($doi['ten_doi']); ?></strong></td>
                                 <td><?php echo escape_html($doi['quoc_gia']); ?></td>
                                 <td><?php echo escape_html($doi['nam_thanh_lap']); ?></td>
@@ -153,7 +208,7 @@ if ($action === 'list') {
                 </h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="<?php echo tao_csrf_token(); ?>">
                     
                     <div class="row">
@@ -175,6 +230,19 @@ if ($action === 'list') {
                                    min="1900" max="<?php echo date('Y'); ?>"
                                    value="<?php echo $doi_tuyen_data ? escape_html($doi_tuyen_data['nam_thanh_lap']) : ''; ?>">
                         </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="logo" class="form-label">Logo đội tuyển</label>
+                        <?php if ($doi_tuyen_data && $doi_tuyen_data['logo'] && image_exists($doi_tuyen_data['logo'], 'logo')): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo get_image_url($doi_tuyen_data['logo'], 'logo'); ?>" 
+                                     alt="Logo hiện tại" class="img-thumbnail" style="max-width: 200px;">
+                                <p class="text-muted small mb-0">Logo hiện tại</p>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" id="logo" name="logo" accept="image/jpeg,image/jpg,image/png,image/gif">
+                        <small class="form-text text-muted">Chấp nhận: JPG, JPEG, PNG, GIF. Tối đa 5MB.</small>
                     </div>
                     
                     <div class="mb-3">

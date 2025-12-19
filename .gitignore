@@ -19,6 +19,12 @@ desktop.ini
 # Upload directories (keep structure but ignore uploaded files)
 uploads/*
 !uploads/.gitkeep
+!uploads/logos/
+!uploads/avatars/
+uploads/logos/*
+!uploads/logos/.gitkeep
+uploads/avatars/*
+!uploads/avatars/.gitkeep
 assets/img/logo/*
 !assets/img/logo/.gitkeep
 assets/img/players/*
