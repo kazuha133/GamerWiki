@@ -63,9 +63,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $success = 'Thêm tuyển thủ thành công!';
                         $action = 'list';
                     } elseif ($action === 'edit' && $id > 0) {
+                        // Get old team ID before update
+                        $stmt = $conn->prepare("SELECT id_doi_tuyen FROM tuyen_thu WHERE id = ?");
+                        $stmt->execute([$id]);
+                        $old_player_data = $stmt->fetch();
+                        $id_doi_cu = $old_player_data ? $old_player_data['id_doi_tuyen'] : null;
+                        
+                        // Update player
                         $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, anh_dai_dien = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
                         $stmt->execute([$ten_that, $nickname, $avatar_filename, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
-                        $success = 'Cập nhật tuyển thủ thành công!';
+                        
+                        // Check if team changed and record transfer history
+                        if ($id_doi_cu !== $id_doi_tuyen) {
+                            try {
+                                $ghi_chu = sanitize_input($_POST['ghi_chu_chuyen_doi'] ?? '');
+                                
+                                $stmt_history = $conn->prepare("
+                                    INSERT INTO lich_su_chuyen_doi 
+                                    (id_tuyen_thu, id_doi_cu, id_doi_moi, ngay_chuyen, ghi_chu) 
+                                    VALUES (?, ?, ?, CURDATE(), ?)
+                                ");
+                                $stmt_history->execute([$id, $id_doi_cu, $id_doi_tuyen, $ghi_chu]);
+                                
+                                $success = 'Cập nhật tuyển thủ và ghi lịch sử chuyển đội thành công!';
+                            } catch (PDOException $e_history) {
+                                // Log error but don't fail the entire operation
+                                $success = 'Cập nhật tuyển thủ thành công! (Lưu ý: Lịch sử chuyển đội không được ghi lại)';
+                                error_log('Lỗi ghi lịch sử chuyển đội: ' . $e_history->getMessage());
+                            }
+                        } else {
+                            $success = 'Cập nhật tuyển thủ thành công!';
+                        }
+                        
                         $action = 'list';
                     }
                 } catch (PDOException $e) {
@@ -278,7 +307,19 @@ if ($action === 'list') {
                             </option>
                             <?php endforeach; ?>
                         </select>
+                        <?php if ($action === 'edit'): ?>
+                        <small class="form-text text-muted">Nếu thay đổi đội, lịch sử chuyển đội sẽ tự động được ghi lại.</small>
+                        <?php endif; ?>
                     </div>
+                    
+                    <?php if ($action === 'edit'): ?>
+                    <div class="mb-3">
+                        <label for="ghi_chu_chuyen_doi" class="form-label">Ghi chú chuyển đội (tùy chọn)</label>
+                        <textarea class="form-control" id="ghi_chu_chuyen_doi" name="ghi_chu_chuyen_doi" rows="2" 
+                                  placeholder="Ví dụ: Chuyển với mức phí chuyển nhượng cao, Tìm kiếm thử thách mới..."></textarea>
+                        <small class="form-text text-muted">Chỉ dùng khi bạn thay đổi đội tuyển của tuyển thủ.</small>
+                    </div>
+                    <?php endif; ?>
                     
                     <div class="mb-3">
                         <label for="mo_ta" class="form-label">Mô tả</label>
