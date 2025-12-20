@@ -67,15 +67,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt = $conn->prepare("SELECT id_doi_tuyen FROM tuyen_thu WHERE id = ?");
                         $stmt->execute([$id]);
                         $old_player_data = $stmt->fetch();
-                        $id_doi_cu = ($old_player_data && isset($old_player_data['id_doi_tuyen'])) ? $old_player_data['id_doi_tuyen'] : null;
+                        
+                        // Distinguish between no player found vs player with NULL team
+                        if ($old_player_data === false) {
+                            // Player not found, but this shouldn't happen as we validated earlier
+                            $id_doi_cu = null;
+                        } else {
+                            $id_doi_cu = $old_player_data['id_doi_tuyen'] ?? null;
+                        }
                         
                         // Update player
                         $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, anh_dai_dien = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
                         $stmt->execute([$ten_that, $nickname, $avatar_filename, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
                         
                         // Check if team changed and record transfer history
-                        // Use loose comparison to handle string/int but preserve NULL distinction
-                        if ($id_doi_cu != $id_doi_tuyen) {
+                        // Use strict comparison to properly distinguish NULL from 0 and handle string/int differences
+                        $team_changed = false;
+                        if ($id_doi_cu === null && $id_doi_tuyen !== null) {
+                            // Free Agent → Join Team
+                            $team_changed = true;
+                        } elseif ($id_doi_cu !== null && $id_doi_tuyen === null) {
+                            // Leave Team → Free Agent
+                            $team_changed = true;
+                        } elseif ($id_doi_cu !== null && $id_doi_tuyen !== null && (int)$id_doi_cu !== (int)$id_doi_tuyen) {
+                            // Transfer between teams (cast to int to handle string vs int)
+                            $team_changed = true;
+                        }
+                        
+                        if ($team_changed) {
                             try {
                                 $ghi_chu = sanitize_input($_POST['ghi_chu_chuyen_doi'] ?? '');
                                 $ngay_chuyen = date('Y-m-d');
