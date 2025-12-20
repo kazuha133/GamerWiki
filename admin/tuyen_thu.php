@@ -67,23 +67,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt = $conn->prepare("SELECT id_doi_tuyen FROM tuyen_thu WHERE id = ?");
                         $stmt->execute([$id]);
                         $old_player_data = $stmt->fetch();
-                        $id_doi_cu = $old_player_data ? $old_player_data['id_doi_tuyen'] : null;
+                        $id_doi_cu = ($old_player_data && isset($old_player_data['id_doi_tuyen'])) ? $old_player_data['id_doi_tuyen'] : null;
                         
                         // Update player
                         $stmt = $conn->prepare("UPDATE tuyen_thu SET ten_that = ?, nickname = ?, anh_dai_dien = ?, vai_tro = ?, quoc_tich = ?, ngay_sinh = ?, id_doi_tuyen = ?, mo_ta = ? WHERE id = ?");
                         $stmt->execute([$ten_that, $nickname, $avatar_filename, $vai_tro, $quoc_tich, $ngay_sinh, $id_doi_tuyen, $mo_ta, $id]);
                         
                         // Check if team changed and record transfer history
-                        if ($id_doi_cu !== $id_doi_tuyen) {
+                        // Use loose comparison to handle string/int but preserve NULL distinction
+                        if ($id_doi_cu != $id_doi_tuyen) {
                             try {
                                 $ghi_chu = sanitize_input($_POST['ghi_chu_chuyen_doi'] ?? '');
+                                $ngay_chuyen = date('Y-m-d');
                                 
                                 $stmt_history = $conn->prepare("
                                     INSERT INTO lich_su_chuyen_doi 
                                     (id_tuyen_thu, id_doi_cu, id_doi_moi, ngay_chuyen, ghi_chu) 
-                                    VALUES (?, ?, ?, CURDATE(), ?)
+                                    VALUES (?, ?, ?, ?, ?)
                                 ");
-                                $stmt_history->execute([$id, $id_doi_cu, $id_doi_tuyen, $ghi_chu]);
+                                $stmt_history->execute([$id, $id_doi_cu, $id_doi_tuyen, $ngay_chuyen, $ghi_chu]);
                                 
                                 $success = 'Cập nhật tuyển thủ và ghi lịch sử chuyển đội thành công!';
                             } catch (PDOException $e_history) {
