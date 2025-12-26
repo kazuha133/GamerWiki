@@ -154,14 +154,12 @@
 
 ### PHP Extensions Required
 
-```
-php-pdo
-php-pdo_mysql
-php-mbstring
-php-json
-php-curl
-php-openssl
-```
+- `php-pdo`
+- `php-pdo_mysql`
+- `php-mbstring`
+- `php-json`
+- `php-curl`
+- `php-openssl`
 
 ### Browser Support
 
