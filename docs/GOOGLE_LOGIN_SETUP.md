@@ -34,10 +34,10 @@ composer install
 2. Đăng nhập bằng tài khoản Google của bạn
 3. Tạo project mới hoặc chọn project hiện có
 
-### 2.2. Kích hoạt Google+ API
+### 2.2. Kích hoạt Google OAuth2 API
 
 1. Vào **APIs & Services** > **Library**
-2. Tìm kiếm "Google+ API" hoặc "Google OAuth2 API"
+2. Tìm kiếm "Google OAuth2 API" hoặc "Google Identity API"
 3. Click vào và chọn **Enable**
 
 ### 2.3. Tạo OAuth 2.0 Client ID

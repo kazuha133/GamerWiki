@@ -88,12 +88,14 @@ try {
         // User chưa tồn tại - tạo mới
         
         // Tạo username từ email (phần trước @)
-        $base_username = sanitize_input(explode('@', $email)[0]);
+        $email_parts = explode('@', $email);
+        $base_username = sanitize_input($email_parts[0]);
         $username = $base_username;
         
-        // Kiểm tra và tránh trùng username
+        // Kiểm tra và tránh trùng username (với giới hạn tối đa 100 lần thử)
         $counter = 1;
-        while (true) {
+        $max_attempts = 100;
+        while ($counter <= $max_attempts) {
             $check_stmt = $conn->prepare("SELECT id FROM nguoi_dung WHERE ten_dang_nhap = ?");
             $check_stmt->execute([$username]);
             if (!$check_stmt->fetch()) {
@@ -101,6 +103,12 @@ try {
             }
             $username = $base_username . $counter;
             $counter++;
+        }
+        
+        // Nếu vượt quá số lần thử, báo lỗi
+        if ($counter > $max_attempts) {
+            header('Location: ' . url('auth/login.php?error=username_generation_failed'));
+            exit();
         }
         
         // Tạo random password (user không cần biết vì đăng nhập bằng Google)

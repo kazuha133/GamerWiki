@@ -44,6 +44,9 @@ if (isset($_GET['error'])) {
         case 'composer_not_installed':
             $error = 'Hệ thống chưa được cấu hình đầy đủ. Vui lòng liên hệ quản trị viên.';
             break;
+        case 'username_generation_failed':
+            $error = 'Không thể tạo tên đăng nhập. Vui lòng thử lại sau.';
+            break;
         default:
             $error = 'Có lỗi xảy ra. Vui lòng thử lại.';
     }
