@@ -43,6 +43,7 @@ config.local.php
 *.bak
 *.backup
 *~
+README.md.backup
 
 # Dependencies (if using Composer)
 vendor/
@@ -50,3 +51,6 @@ composer.lock
 
 # Session files
 sessions/
+
+# Logs
+/logs/*.log
