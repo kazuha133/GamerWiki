@@ -7,4 +7,8 @@ ALTER TABLE nguoi_dung ADD COLUMN google_id VARCHAR(255) DEFAULT NULL;
 -- Add unique index on google_id to prevent duplicate Google accounts
 ALTER TABLE nguoi_dung ADD UNIQUE INDEX idx_google_id (google_id);
 
+-- Add unique constraint on email if not exists (important for Google OAuth linking)
+-- This ensures each email can only be used once
+ALTER TABLE nguoi_dung ADD UNIQUE INDEX idx_email (email);
+
 -- Note: Existing users can link their Google account by logging in with Google using the same email

@@ -46,6 +46,7 @@ config.local.php
 
 # Dependencies (if using Composer)
 vendor/
+composer.lock
 
 # Session files
 sessions/
