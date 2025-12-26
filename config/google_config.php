@@ -6,8 +6,8 @@
 
 // Google OAuth credentials
 // NOTE: Replace these with your actual credentials from Google Cloud Console
-define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID_HERE');
-define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET_HERE');
+define('GOOGLE_CLIENT_ID', '1024113193318-l5u955c2m8b23msv17motopmk7lf4k23.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', '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');
 define('GOOGLE_REDIRECT_URI', 'http://localhost/GamerWiki/auth/google_callback.php');
 
 /**

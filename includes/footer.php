@@ -16,7 +16,7 @@
                 </div>
                 <div class="col-md-3">
                     <h6>Thông tin</h6>
-                    <p class="text-white-50 mb-0">© 2024 GamerWiki</p>
+                    <p class="text-white-50 mb-0">© 2025 GamerWiki</p>
                     <p class="text-white-50">Mọi quyền được bảo lưu</p>
                 </div>
             </div>

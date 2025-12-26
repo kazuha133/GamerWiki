@@ -135,11 +135,23 @@ try {
     }
     
 } catch (Exception $e) {
-    // Log lỗi (trong production nên log vào file)
-    error_log('Google OAuth Error: ' . $e->getMessage());
-    
-    // Redirect về login với thông báo lỗi chung
-    header('Location: ' . url('auth/login.php?error=oauth_failed'));
+    // HIỂN THỊ LỖI CHI TIẾT
+    echo "<! DOCTYPE html>";
+    echo "<html><head><meta charset='UTF-8'><title>Google Login Error</title></head><body>";
+    echo "<h2 style='color: red;'>🔴 Google Login Error Debug</h2>";
+    echo "<h3>Error Message: </h3>";
+    echo "<p style='background:  #ffebee; padding: 15px; border: 2px solid red;'>";
+    echo htmlspecialchars($e->getMessage());
+    echo "</p>";
+    echo "<h3>Error Location:</h3>";
+    echo "<p>File: " . $e->getFile() . "<br>";
+    echo "Line:  " . $e->getLine() . "</p>";
+    echo "<h3>Stack Trace:</h3>";
+    echo "<pre style='background: #f5f5f5; padding: 15px; overflow:  auto;'>";
+    echo htmlspecialchars($e->getTraceAsString());
+    echo "</pre>";
+    echo "<br><a href='" . url('auth/login. php') . "'>← Back to Login</a>";
+    echo "</body></html>";
     exit();
 }
 ?>
