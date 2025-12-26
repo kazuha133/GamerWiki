@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Đăng nhập';
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/google_config.php';
 
 // Nếu đã đăng nhập, redirect về trang chủ
 if (kiem_tra_dang_nhap()) {
@@ -8,15 +9,52 @@ if (kiem_tra_dang_nhap()) {
     exit();
 }
 
+// Khởi tạo Google Client và lấy URL đăng nhập
+$google_login_url = '#';
+try {
+    if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+        $google_client = get_google_client();
+        $google_login_url = $google_client->createAuthUrl();
+    }
+} catch (Exception $e) {
+    // Nếu có lỗi, giữ URL mặc định
+}
+
 $error = '';
 $success = '';
+
+// Xử lý thông báo lỗi từ Google OAuth callback
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'no_code':
+            $error = 'Không nhận được mã xác thực từ Google.';
+            break;
+        case 'token_error':
+            $error = 'Không thể lấy access token từ Google.';
+            break;
+        case 'invalid_email':
+            $error = 'Email từ Google không hợp lệ.';
+            break;
+        case 'account_inactive':
+            $error = 'Tài khoản của bạn đã bị khóa.';
+            break;
+        case 'oauth_failed':
+            $error = 'Đăng nhập Google thất bại. Vui lòng thử lại.';
+            break;
+        case 'composer_not_installed':
+            $error = 'Hệ thống chưa được cấu hình đầy đủ. Vui lòng liên hệ quản trị viên.';
+            break;
+        default:
+            $error = 'Có lỗi xảy ra. Vui lòng thử lại.';
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ten_dang_nhap = sanitize_input($_POST['ten_dang_nhap'] ?? '');
     $mat_khau = $_POST['mat_khau'] ?? '';
     
     // DEBUG MODE - BẬT ĐỂ KIỂM TRA (xóa sau khi fix)
-    $debug_mode = true; // Đổi thành false sau khi fix xong
+    $debug_mode = false; // Đổi thành false sau khi fix xong
     
     if (empty($ten_dang_nhap) || empty($mat_khau)) {
         $error = 'Vui lòng nhập đầy đủ thông tin.';
@@ -103,6 +141,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
                     </form>
+                    
+                    <div class="text-center my-3">
+                        <div class="d-flex align-items-center">
+                            <hr class="flex-grow-1">
+                            <span class="mx-3 text-muted">hoặc</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                    </div>
+                    
+                    <a href="<?php echo escape_html($google_login_url); ?>" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-google"></i> Đăng nhập bằng Google
+                    </a>
                     
                     <div class="text-center mt-3">
                         <p>Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>

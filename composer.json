@@ -1,0 +1,20 @@
+{
+    "name": "kazuha133/gamerwiki",
+    "description": "GamerWiki - Hệ thống quản lý đội tuyển Esport",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "google/apiclient": "^2.0"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "GamerWiki\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}
